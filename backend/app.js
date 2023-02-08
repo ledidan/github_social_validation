@@ -57,16 +57,25 @@ app.post(
   "/CreateNewAccessCode",
   asyncHandler(async (req, res) => {
     const { phoneNumber } = req.body;
-    await firebase
-      .database()
-      .ref(`phoneNumbers/${phoneNumber}`)
-      .set({ accessCode });
-    const messageConfig = {
-      to: phoneNumber,
-      from: `${process.env.TWILIO_PHONE_NUMBER}`,
-      body: `Your github social access code is: ${accessCode}`,
-    };
-    await client.messages.create(messageConfig);
+    if (phoneNumber) {
+      await firebase
+        .database()
+        .ref(`phoneNumbers/${phoneNumber}`)
+        .set({ accessCode });
+      const messageConfig = {
+        to: phoneNumber,
+        from: `${process.env.TWILIO_PHONE_NUMBER}`,
+        body: `Your github social access code is: ${accessCode}`,
+      };
+      await client.messages.create(messageConfig);
+      res.json({
+        message: `A OTP (6 digit code) has been sent to ( ${phoneNumber} ). Please enter the OTP in the field below to verify your phone`,
+      });
+    } else {
+      res.status(500).json({
+        error: "Invalid phone number, Please enter your phone correctly",
+      });
+    }
   })
 );
 
@@ -85,7 +94,9 @@ app.post(
         .update({ accessCode: "" });
       res.json({ success: true });
     } else {
-      res.status(400).json({ success: false });
+      res
+        .status(400)
+        .json({ success: false, error: `Invalid OTP Code Entered` });
     }
   })
 );
