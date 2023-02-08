@@ -67,8 +67,6 @@ app.post(
       body: `Your github social access code is: ${accessCode}`,
     };
     await client.messages.create(messageConfig);
-
-    res.json({ accessCode });
   })
 );
 
@@ -142,7 +140,7 @@ app.post(
     await firebase
       .database()
       .ref(`phoneNumbers/${phoneNumber}/favorite_github_users`)
-      .push(user);
+      .push(user.set({ user }));
 
     res.sendStatus(200);
   })
