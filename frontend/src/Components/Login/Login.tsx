@@ -1,43 +1,52 @@
-import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-import { LOCALHOST } from '../../utils/System'
+import React, { useState } from 'react'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import { Divider } from '@mui/material'
+import { AlertTitle, Divider } from '@mui/material'
 import TextField from '@mui/material/TextField'
 import Alert from '@mui/material/Alert'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
-import CloseIcon from '@mui/icons-material/Close'
 import PhoneInput from 'react-phone-input-2'
-interface GithubType {
-  id: number
-  login: any
-}
-interface GithubUser {
-  id: number
-  login: any
-  avatar_url: any
-  followers: any
-  public_repos: any
-}
-
+import LoadingButton from '@mui/lab/LoadingButton'
+import SendIcon from '@mui/icons-material/Send'
+import { useMutation } from '@tanstack/react-query'
+import { createNewAccessCode, validateAccessCode } from '../../apis/auth.api'
 export default function Login() {
   const [accessCode, setAccessCode] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
+  const [message, setMessage] = useState('')
   const [open, setOpen] = React.useState(true)
 
-  const createNewAccessCode = async () => {
-    const response = await axios.post('/createNewAccessCode', { phoneNumber })
-    setAccessCode(response.data)
-  }
+  const getAccessCode = useMutation({
+    mutationFn: (phoneNumber: string) => {
+      return createNewAccessCode(phoneNumber)
+    },
+    onSuccess: async (response) => {
+      return await setMessage(response.data.message)
+    },
+    onError: async (response: any) => {
+      return await setMessage(response.data.error)
+    }
+  })
 
-  const validateAccessCode = async () => {
-    await axios.post('/validateAccessCode', { accessCode, phoneNumber })
+  const validateCode = useMutation({
+    mutationFn: (_) => {
+      return validateAccessCode(accessCode as string, phoneNumber as string)
+    },
+    onSuccess: (response) => {
+      return response.data, setAccessCode(''), localStorage.setItem('phoneNumber', phoneNumber)
+    }
+  })
+
+  const handleCreateCode = (phoneNumber: string) => {
+    return getAccessCode.mutate(phoneNumber)
+  }
+  const handleValidateCode = (accessCode: any, phoneNumber: any) => {
+    return validateCode.mutate(accessCode, phoneNumber)
   }
   return (
     <>
@@ -64,77 +73,100 @@ export default function Login() {
             className='flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:py-12 lg:px-16 xl:col-span-6'
           >
             <div className='max-w-xl lg:max-w-3xl'>
-              <Card sx={{ maxWidth: 500, p: 4, boxShadow: 10 }}>
-                <CardContent>
-                  <Typography sx={{ fontSize: 14 }} color='text.secondary' gutterBottom>
-                    Validate OTP (One Time Passcode)
-                  </Typography>
-                  <Divider />
-                  <Typography sx={{ mt: 2.5, fontSize: 14 }} color='text.secondary'>
-                    A new security system has been enabled for you. Please register your phone to continue.
-                  </Typography>
-                </CardContent>
-                <Box
-                  component='form'
-                  sx={{
-                    '& .MuiTextField-root': { width: 400, maxWidth: '100%' }
-                  }}
-                  noValidate
-                  autoComplete='off'
-                >
-                  <Box sx={{ width: '100%' }}>
-                    <PhoneInput
-                      inputStyle={{ width: '90%' }}
-                      country={'us'}
-                      aria-required={true}
-                      value={phoneNumber}
-                      onChange={(phoneNumber) => setPhoneNumber(phoneNumber)}
-                    />
-                  </Box>
-                  <Box sx={{ width: '90%' }}>
-                    <Collapse in={open} sx={{ my: 1 }}>
-                      <Alert
-                        icon={false}
-                        severity='success'
-                        action={
-                          <IconButton
-                            aria-label='close'
-                            color='inherit'
-                            onClick={() => {
-                              setOpen(false)
-                            }}
+              {validateCode.isSuccess ? (
+                <Alert severity='success'>
+                  <AlertTitle>Verified</AlertTitle>
+                  Your phone has successfully verified — <strong>Congratulation !!</strong>
+                </Alert>
+              ) : (
+                <Card sx={{ maxWidth: 500, p: 4, boxShadow: 10 }}>
+                  <CardContent>
+                    <Typography sx={{ fontSize: 14 }} color='text.secondary' gutterBottom>
+                      Validate OTP (One Time Passcode)
+                    </Typography>
+                    <Divider />
+                    <Typography sx={{ mt: 2.5, fontSize: 14 }} color='text.secondary'>
+                      A new security system has been enabled for you. Please register your phone to continue.
+                    </Typography>
+                  </CardContent>
+                  <Box
+                    component='form'
+                    sx={{
+                      '& .MuiTextField-root': { width: 400, maxWidth: '100%' }
+                    }}
+                    noValidate
+                    autoComplete='off'
+                  >
+                    <Box sx={{ width: '100%', my: 2 }}>
+                      <PhoneInput
+                        inputStyle={{ width: '90%' }}
+                        country={'us'}
+                        aria-required={true}
+                        value={phoneNumber}
+                        onChange={(phoneNumber) => setPhoneNumber(phoneNumber)}
+                      />
+                      {}
+                    </Box>
+                    {getAccessCode.isSuccess && (
+                      <Box sx={{ width: '90%' }}>
+                        <Collapse in={open} sx={{ my: 1 }}>
+                          <Alert
+                            icon={false}
+                            severity='success'
+                            action={
+                              <IconButton
+                                aria-label='close'
+                                color='inherit'
+                                onClick={() => {
+                                  setOpen(false)
+                                }}
+                              ></IconButton>
+                            }
                           >
-                            <CloseIcon fontSize='inherit' />
-                          </IconButton>
-                        }
-                      >
-                        A OTP (6 digit code) has been sent to +078574234. Please enter the OTP in the field below to
-                        verify your phone
-                      </Alert>
-                    </Collapse>
+                            {message}
+                          </Alert>
+                        </Collapse>
+                      </Box>
+                    )}
+
+                    <div>
+                      <TextField
+                        required
+                        id='outlined-required'
+                        label='Verify Code: '
+                        value={accessCode}
+                        onChange={(e) => setAccessCode(e.target.value)}
+                        size='small'
+                        type='text'
+                        helperText='Please enter your code to validate'
+                      />
+                    </div>
                   </Box>
-                  <div>
-                    <TextField
-                      required
-                      id='outlined-required'
-                      label='Verify Code: '
-                      value={accessCode}
-                      onChange={(e) => setAccessCode(e.target.value)}
-                      size='small'
-                      type='text'
-                      helperText='Please enter your code to validate'
-                    />
-                  </div>
-                </Box>
-                <CardActions>
-                  <Button type='submit' size='small' variant='contained' onClick={createNewAccessCode}>
-                    Get a one - time access Code
-                  </Button>
-                  <Button type='submit' size='small' variant='contained' onClick={validateAccessCode}>
-                    Validate
-                  </Button>
-                </CardActions>
-              </Card>
+                  <CardActions>
+                    {!getAccessCode.isSuccess ? (
+                      <Button
+                        type='submit'
+                        size='small'
+                        variant='contained'
+                        onClick={() => handleCreateCode(phoneNumber)}
+                      >
+                        Get a one - time access Code
+                      </Button>
+                    ) : (
+                      <LoadingButton
+                        size='small'
+                        onClick={() => handleValidateCode(accessCode, phoneNumber)}
+                        endIcon={<SendIcon />}
+                        loading={getAccessCode.isLoading}
+                        loadingPosition='end'
+                        variant='contained'
+                      >
+                        <span>Validate</span>
+                      </LoadingButton>
+                    )}
+                  </CardActions>
+                </Card>
+              )}
             </div>
           </main>
         </div>
