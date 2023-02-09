@@ -5,5 +5,5 @@ interface Props {
 }
 
 export default function MainLayout({ children }: Props) {
-  return <main className='col-span-3 h-full '>{children}</main>
+  return <main className='col-span-3 h-full'>{children}</main>
 }
