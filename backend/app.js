@@ -6,7 +6,7 @@ const axios = require("axios");
 const app = express();
 const cors = require("cors");
 const asyncHandler = require("express-async-handler");
-PORT = process.env.PORT;
+const PORT = process.env.PORT;
 app.use(express.json());
 app.use(cors());
 // Config Firebase Setup
@@ -104,16 +104,34 @@ app.post(
 app.get(
   "/searchGithubUsers",
   asyncHandler(async (req, res) => {
-    const { q, page = 1, per_page = 10 } = req.query;
-    const response = await axios.get(
-      `https://api.github.com/search/users?q=${q}&page=${page}&per_page=${per_page}`
-    );
-    // const users = response.data.items.map((item) => ({
-    //   login: item.login,
-    //   id: item.id,
-    // }));
-    const users = response.data;
-    res.json(users);
+    try {
+      const { q, page = 1, per_page = 10 } = req.query;
+      const response = await axios.get(
+        `https://api.github.com/search/users?q=${q}&page=${page}&per_page=${per_page}`
+      );
+
+      const totalCount = Math.min(response.data.total_count, 1000);
+      res.json({ total_count: totalCount, items: response.data.items });
+      // const totalCount = Math.min(response.data.total_count, 1000);
+      // const filteredItems = [];
+      // for (const user of response.data.items) {
+      //   const userResponse = await axios.get(
+      //     `https://api.github.com/user/${user.id}`
+      //   );
+      //   filteredItems.push({
+      //     login: userResponse.data.login,
+      //     id: userResponse.data.id,
+      //     avatar_url: userResponse.data.avatar_url,
+      //     html_url: userResponse.data.html_url,
+      //     public_repos: userResponse.data.public_repos,
+      //     followers: userResponse.data.followers,
+      //   });
+      // }
+
+      // res.json({ total_count: totalCount, items: filteredItems });
+    } catch (error) {
+      res.status(500).send({ error: error.message });
+    }
   })
 );
 
@@ -124,9 +142,8 @@ app.get(
     const response = await axios.get(
       `https://api.github.com/user/${github_user_id}`
     );
-    const { login, id, avatar_url, html_url, public_repos, followers } =
-      response.data;
-    res.json({ login, id, avatar_url, html_url, public_repos, followers });
+
+    res.json(response.data);
   })
 );
 
@@ -148,10 +165,12 @@ app.post(
       followers: followers,
     };
 
-    await firebase
+    const newChildRef = await firebase
       .database()
       .ref(`phoneNumbers/${phoneNumber}/favorite_github_users`)
-      .push(user.set({ user }));
+      .push();
+
+    newChildRef.set(user);
 
     res.sendStatus(200);
   })
