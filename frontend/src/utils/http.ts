@@ -4,7 +4,7 @@ class Http {
   instance: AxiosInstance
   constructor() {
     this.instance = axios.create({
-      baseURL: 'http://localhost:4000/',
+      baseURL: process.env.backend,
       headers: {
         'Content-Type': 'application/json'
       }
