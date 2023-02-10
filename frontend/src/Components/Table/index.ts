@@ -1,3 +1,2 @@
-import Table from './Table'
-
+import Table from './TableUser'
 export { Table }

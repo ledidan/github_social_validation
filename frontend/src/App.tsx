@@ -1,17 +1,17 @@
 import { useRoutes } from 'react-router-dom'
 import './App.css'
-import Login from './Components/Login/Login'
 import MainLayout from './Layouts/MainLayout/MainLayout'
 import { Dashboard } from './Components/Dashboard'
-import { Table } from './Components/Table'
 import { Routes, Route, Outlet, useLocation, Navigate } from 'react-router-dom'
+import TableUser from './Components/Table/TableUser'
+import { Login } from './Components/Login'
 function App() {
   const elements = useRoutes([
     {
       path: '/dashboard',
       element: (
         <Dashboard>
-          <Table />
+          <TableUser />
         </Dashboard>
       )
     },

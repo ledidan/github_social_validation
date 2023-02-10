@@ -1,11 +1,12 @@
 export interface GithubUser {
   login: string
-  id: number
+  id: number | string
   avatar_url: string
   html_url: string
   public_repos: string
   followers: number
   items: any
+  total_count: number
   action: () => void
 }
 export interface GithubUsersData {
