@@ -19,7 +19,7 @@ import { createNewAccessCode, validateAccessCode } from '../../apis/auth.api'
 export default function Login() {
   const [accessCode, setAccessCode] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
-  const [message, setMessage] = useState('')
+  const [messageSuccess, setMessageSuccess] = useState('')
   const [open, setOpen] = React.useState(true)
 
   const getAccessCode = useMutation({
@@ -27,10 +27,7 @@ export default function Login() {
       return createNewAccessCode(phoneNumber)
     },
     onSuccess: async (response) => {
-      return await setMessage(response.data.message)
-    },
-    onError: async (response: any) => {
-      return await setMessage(response.data.error)
+      return await setMessageSuccess(response.data.message)
     }
   })
 
@@ -106,7 +103,6 @@ export default function Login() {
                         value={phoneNumber}
                         onChange={(phoneNumber) => setPhoneNumber(phoneNumber)}
                       />
-                      {}
                     </Box>
                     {getAccessCode.isSuccess && (
                       <Box sx={{ width: '90%' }}>
@@ -124,12 +120,32 @@ export default function Login() {
                               ></IconButton>
                             }
                           >
-                            {message}
+                            {messageSuccess}
                           </Alert>
                         </Collapse>
                       </Box>
                     )}
-
+                    {getAccessCode.isError && (
+                      <Box sx={{ width: '90%' }}>
+                        <Collapse in={open} sx={{ my: 1 }}>
+                          <Alert
+                            icon={false}
+                            severity='error'
+                            action={
+                              <IconButton
+                                aria-label='close'
+                                color='inherit'
+                                onClick={() => {
+                                  setOpen(false)
+                                }}
+                              ></IconButton>
+                            }
+                          >
+                            {'Invalid phone number, Please enter your phone correctly'}
+                          </Alert>
+                        </Collapse>
+                      </Box>
+                    )}
                     <div>
                       <TextField
                         required
@@ -142,6 +158,27 @@ export default function Login() {
                         helperText='Please enter your code to validate'
                       />
                     </div>
+                    {validateCode.isError && (
+                      <Box sx={{ width: '90%' }}>
+                        <Collapse in={open} sx={{ my: 1 }}>
+                          <Alert
+                            icon={false}
+                            severity='error'
+                            action={
+                              <IconButton
+                                aria-label='close'
+                                color='inherit'
+                                onClick={() => {
+                                  setOpen(false)
+                                }}
+                              ></IconButton>
+                            }
+                          >
+                            {'Invalid OTP Code Entered'}
+                          </Alert>
+                        </Collapse>
+                      </Box>
+                    )}
                   </Box>
                   <CardActions>
                     {!getAccessCode.isSuccess ? (

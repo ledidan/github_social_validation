@@ -1,31 +1,42 @@
-import { useRoutes } from 'react-router-dom'
+import * as React from 'react'
+import { useNavigate, Route, Routes, useRoutes } from 'react-router-dom'
 import './App.css'
 import MainLayout from './Layouts/MainLayout/MainLayout'
 import { Dashboard } from './Components/Dashboard'
-import { Routes, Route, Outlet, useLocation, Navigate } from 'react-router-dom'
 import TableUser from './Components/Table/TableUser'
 import { Login } from './Components/Login'
+
 function App() {
+  const userLogged = Boolean(localStorage.getItem('phoneNumber'))
+
+  const navigate = useNavigate()
+
+  React.useEffect(() => {
+    if (!userLogged) {
+      return navigate('/')
+    } else {
+      return navigate('/dashboard')
+    }
+  }, [userLogged])
   const elements = useRoutes([
     {
-      path: '/dashboard',
       element: (
-        <Dashboard>
-          <TableUser />
-        </Dashboard>
-      )
-    },
-    {
-      path: '/*',
-      element: <Login />
+        <MainLayout>
+          <Dashboard>
+            <TableUser />
+          </Dashboard>
+        </MainLayout>
+      ),
+      path: '/dashboard'
     }
   ])
   return (
-    <>
-      <div className='App'>
-        <MainLayout>{elements}</MainLayout>
-      </div>
-    </>
+    <div className='App'>
+      <Routes>
+        <Route path={'/dashboard'} element={elements} />
+        <Route path='/' element={<Login />} />
+      </Routes>
+    </div>
   )
 }
 

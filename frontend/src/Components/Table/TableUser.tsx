@@ -3,6 +3,7 @@ import * as React from 'react'
 import { findGithubUserProfile, likeGithubUser, searchGithubUsers } from '../../apis/profile.api'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
+import { ToastContainer, toast } from 'react-toastify'
 import SearchIcon from '@mui/icons-material/Search'
 import { styled, alpha } from '@mui/material/styles'
 import InputBase from '@mui/material/InputBase'
@@ -102,6 +103,16 @@ export default function () {
     },
     onSuccess: (_, id) => {
       setIsLiked(true)
+      toast.success(`You liked Github User: ${id}`, {
+        position: 'top-right',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light'
+      })
       queryClient.invalidateQueries({
         queryKey: ['dashboard', query, page, rowsPerPage],
         exact: true
@@ -114,6 +125,7 @@ export default function () {
 
   return (
     <>
+      <ToastContainer />
       <Search sx={{ width: '100%' }} className='mb-3 shadow-sm'>
         <SearchIconWrapper>
           <SearchIcon />
@@ -169,7 +181,7 @@ export default function () {
                 </th>
                 <td className='py-3 px-6' onChange={() => ''}>
                   <button onClick={() => handleClick(user.id)}>
-                    <FavoriteIcon color={!isLiked ? 'disabled' : 'primary'} />
+                    <FavoriteIcon color='primary' />
                   </button>
                 </td>
               </tr>

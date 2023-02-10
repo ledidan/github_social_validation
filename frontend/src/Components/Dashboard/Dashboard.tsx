@@ -56,7 +56,7 @@ export default function Dashboard({ children }: Props) {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Sign Out</MenuItem>
+      <MenuItem onClick={() => localStorage.removeItem('phoneNumber')}>Sign Out</MenuItem>
     </Menu>
   )
 
