@@ -104,34 +104,13 @@ app.post(
 app.get(
   "/searchGithubUsers",
   asyncHandler(async (req, res) => {
-    try {
-      const { q, page = 1, per_page = 10 } = req.query;
-      const response = await axios.get(
-        `https://api.github.com/search/users?q=${q}&page=${page}&per_page=${per_page}`
-      );
+    const { q, page = 1, per_page = 10 } = req.query;
+    const response = await axios.get(
+      `https://api.github.com/search/users?q=${q}&page=${page}&per_page=${per_page}`
+    );
 
-      const totalCount = Math.min(response.data.total_count, 1000);
-      res.json({ total_count: totalCount, items: response.data.items });
-      // const totalCount = Math.min(response.data.total_count, 1000);
-      // const filteredItems = [];
-      // for (const user of response.data.items) {
-      //   const userResponse = await axios.get(
-      //     `https://api.github.com/user/${user.id}`
-      //   );
-      //   filteredItems.push({
-      //     login: userResponse.data.login,
-      //     id: userResponse.data.id,
-      //     avatar_url: userResponse.data.avatar_url,
-      //     html_url: userResponse.data.html_url,
-      //     public_repos: userResponse.data.public_repos,
-      //     followers: userResponse.data.followers,
-      //   });
-      // }
-
-      // res.json({ total_count: totalCount, items: filteredItems });
-    } catch (error) {
-      res.status(500).send({ error: error.message });
-    }
+    const totalCount = Math.min(response.data.total_count, 1000);
+    res.json({ total_count: totalCount, items: response.data.items });
   })
 );
 
@@ -143,7 +122,10 @@ app.get(
       `https://api.github.com/user/${github_user_id}`
     );
 
-    res.json(response.data);
+    const { login, id, avatar_url, html_url, public_repos, followers } =
+      response.data;
+
+    res.json({ login, id, avatar_url, html_url, public_repos, followers });
   })
 );
 
@@ -171,10 +153,10 @@ app.post(
       .push();
 
     newChildRef.set(user);
-
     res.sendStatus(200);
   })
 );
+
 app.get(
   "/getUserProfile",
   asyncHandler(async (req, res) => {
