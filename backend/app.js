@@ -8,40 +8,34 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const asyncHandler = require("express-async-handler");
 const PORT = process.env.PORT;
+
 app.use(express.json());
 
-app.use(cors({ origin: "*" }));
-// Stringify JSON
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
     extended: true,
   })
 );
-// Add headers before the routes are defined
-app.use(function (req, res, next) {
-  // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin", process.env.CLIENT_URL_VERCEL);
 
-  // Request methods you wish to allow
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-  );
+const allowedDomains = [process.env.CLIENT_URL_VERCEL];
 
-  // Request headers you wish to allow
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
-  );
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // bypass the requests with no origin (like curl requests, mobile apps, etc )
+      if (!origin) return callback(null, true);
 
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
-  res.setHeader("Access-Control-Allow-Credentials", true);
-
-  // Pass to next layer of middleware
-  next();
-});
+      if (allowedDomains.indexOf(origin) === -1) {
+        var msg = `This site ${origin} does not have an access. Only specific domains are allowed to access it.`;
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+  })
+);
 // Config Firebase Setup
 
 firebase.initializeApp({
