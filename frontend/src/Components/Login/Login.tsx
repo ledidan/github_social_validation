@@ -35,8 +35,8 @@ export default function Login() {
     mutationFn: (_) => {
       return validateAccessCode(accessCode as string, phoneNumber as string)
     },
-    onSuccess: (response) => {
-      return response.data, setAccessCode(''), localStorage.setItem('phoneNumber', phoneNumber)
+    onSuccess: async (response) => {
+      return await response.data, setAccessCode(''), localStorage.setItem('phoneNumber', phoneNumber)
     }
   })
 
