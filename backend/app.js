@@ -10,22 +10,7 @@ const asyncHandler = require("express-async-handler");
 const PORT = process.env.PORT;
 app.use(express.json());
 
-const allowedDomain = process.env.CLIENT_URL_VERCEL;
-
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedDomain.indexOf(origin) === -1) {
-        const msg = `This site ${origin} does not have an access. Only specific domains are allowed to access it.`;
-        return callback(new Error(msg), false);
-      }
-      return callback(null, true);
-    },
-    methods: "GET, POST, PUT, DELETE",
-    credentials: true,
-  })
-);
+app.use(cors({ origin: "*" }));
 // Stringify JSON
 app.use(bodyParser.json());
 app.use(
