@@ -5,6 +5,7 @@ const firebase = require("firebase-admin");
 const axios = require("axios");
 const app = express();
 const cors = require("cors");
+const bodyParser = require("body-parser");
 const asyncHandler = require("express-async-handler");
 const PORT = process.env.PORT;
 app.use(express.json());
@@ -23,6 +24,13 @@ app.use(
   // },
   // methods: "GET, POST, PUT, DELETE",
   // credentials: true,
+);
+// Stringify JSON
+app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
 );
 // Add headers before the routes are defined
 app.use(function (req, res, next) {
