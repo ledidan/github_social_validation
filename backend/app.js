@@ -127,7 +127,7 @@ app.post(
     } else {
       res
         .status(400)
-        .json({ success: false, error: `Invalid OTP Code Entered` });
+        .json({ success: false, error: `Invalid OTP Code Entered, try again` });
     }
   })
 );
