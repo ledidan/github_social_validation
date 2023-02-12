@@ -94,7 +94,8 @@ app.post(
         .set({ accessCode });
       const messageConfig = {
         to: phoneNumber,
-        from: `${process.env.TWILIO_PHONE_NUMBER}`,
+        // from: `${process.env.TWILIO_PHONE_NUMBER}`,
+        messagingServiceSid: process.env.TWILIO_MESSAGE_SERVICE_SID,
         body: `Your github social access code is: ${accessCode}`,
       };
       await client.messages.create(messageConfig);
