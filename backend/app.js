@@ -7,7 +7,6 @@ const app = express();
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const asyncHandler = require("express-async-handler");
-const PORT = process.env.PORT;
 
 app.use(express.json());
 
@@ -208,7 +207,7 @@ app.get(
     });
   })
 );
-
+const PORT = process.env.PORT || 1000;
 app.listen(PORT, () => console.log(`Listening on port - ${PORT}`));
 
 module.exports = app;
