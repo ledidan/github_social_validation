@@ -18,20 +18,20 @@ app.use(
   })
 );
 
-const allowedDomains = process.env.CLIENT_URL_VERCEL;
+const allowDomain = (req, res, next) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    `"${process.env.CLIENT_URL_VERCEL}"`
+  );
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
 
-app.use(
-  cors({
-    methods: "GET,POST,PATCH,DELETE,OPTIONS",
-    optionsSuccessStatus: 200,
-    origin: process.env.CLIENT_URL_VERCEL,
-  })
-);
-app.options("*", cors());
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
   next();
-});
+};
+
+app.use(cors());
+app.use(allowDomain);
+
 // Config Firebase Setup
 
 firebase.initializeApp({
