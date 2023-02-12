@@ -24,10 +24,14 @@ app.use(
   cors({
     methods: "GET,POST,PATCH,DELETE,OPTIONS",
     optionsSuccessStatus: 200,
-    origin: `${process.env.CLIENT_URL_VERCEL}`,
+    origin: process.env.CLIENT_URL_VERCEL,
   })
 );
 app.options("*", cors());
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
 // Config Firebase Setup
 
 firebase.initializeApp({
