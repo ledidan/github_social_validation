@@ -29,8 +29,9 @@ app.use(
       if (allowedDomains.indexOf(origin) === -1) {
         var msg = `This site ${origin} does not have an access. Only specific domains are allowed to access it.`;
         return callback(new Error(msg), false);
+      } else {
+        return callback(null, true);
       }
-      return callback(null, true);
     },
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
