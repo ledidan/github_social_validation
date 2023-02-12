@@ -98,7 +98,7 @@ app.post(
         messagingServiceSid: process.env.TWILIO_MESSAGE_SERVICE_SID,
         body: `Your github social access code is: ${accessCode}`,
       };
-      await client.messages.create(messageConfig);
+      client.messages.create(messageConfig);
       res.json({
         message: `A OTP (6 digit code) has been sent to ( ${phoneNumber} ). Please enter the OTP in the field below to verify your phone`,
       });
