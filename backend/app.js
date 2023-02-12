@@ -7,7 +7,6 @@ const app = express();
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const asyncHandler = require("express-async-handler");
-
 app.use(express.json());
 
 app.use(bodyParser.json());
@@ -88,10 +87,13 @@ app.post(
   asyncHandler(async (req, res) => {
     const { phoneNumber } = req.body;
     if (phoneNumber) {
+      // Save the access code in Firebase Realtime Database
       await firebase
         .database()
         .ref(`phoneNumbers/${phoneNumber}`)
         .set({ accessCode });
+
+      // Send the access code via SMS using Twilio
       const messageConfig = {
         to: phoneNumber,
         // from: `${process.env.TWILIO_PHONE_NUMBER}`,
@@ -99,6 +101,7 @@ app.post(
         body: `Your github social access code is: ${accessCode}`,
       };
       client.messages.create(messageConfig);
+      // Return a success response to the client
       res.json({
         message: `A OTP (6 digit code) has been sent to ( ${phoneNumber} ). Please enter the OTP in the field below to verify your phone`,
       });
