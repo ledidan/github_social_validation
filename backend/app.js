@@ -18,7 +18,7 @@ app.use(
   })
 );
 
-const allowedDomains = [process.env.CLIENT_URL_VERCEL];
+const allowedDomains = process.env.CLIENT_URL_VERCEL;
 
 app.use(
   cors({
@@ -26,7 +26,7 @@ app.use(
       // bypass the requests with no origin (like curl requests, mobile apps, etc )
       if (!origin) return callback(null, true);
 
-      if (allowedDomains.indexOf(origin) === -1) {
+      if (allowedDomains === -1) {
         var msg = `This site ${origin} does not have an access. Only specific domains are allowed to access it.`;
         return callback(new Error(msg), false);
       }
