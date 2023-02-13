@@ -19,26 +19,25 @@ const allowedDomains = [
   process.env.CLIENT_URL_VERCEL,
   process.env.CLIENT_LOCALHOST_URL,
 ];
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // bypass the requests with no origin (like curl requests, mobile apps, etc )
-      if (!origin) return callback(null, true);
-
-      if (allowedDomains.indexOf(origin) === -1) {
-        var msg = `This site ${origin} does not have an access. Only specific domains are allowed to access it.`;
-        return callback(new Error(msg), false);
-      } else {
-        return callback(null, true);
-      }
-    },
-    methods: "GET,POST,PUT,DELETE",
-    credentials: true,
-  })
-);
-
+// app.use(cors({ origin: "*"}, ));
 // Config Firebase Setup
-
+app.use(function (req, res, next) {
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "http://localhost:3000",
+    "https://github-social-validation.vercel.app"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-Requested-With,content-type"
+  );
+  res.setHeader("Access-Control-Allow-Credentials", true);
+  next();
+});
 firebase.initializeApp({
   credential: firebase.credential.cert({
     projectId: process.env.FIREBASE_PROJECT_ID,
