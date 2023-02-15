@@ -15,6 +15,7 @@ app.use(
     extended: true,
   })
 );
+// Config Cors
 app.use(
   cors({
     origin: [process.CLIENT_LOCALHOST_URL, process.env.CLIENT_URL_VERCEL],
