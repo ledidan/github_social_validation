@@ -59,6 +59,7 @@ export default function () {
   const [profileIsOpen, setProfileIsOpen] = React.useState(false)
 
   const queryString: { page?: string | number } = useQueryString()
+  const page = Number(queryString.page) || 1
   // Handle Profile Dialog
   const handleProfileOpen = () => {
     setProfileIsOpen(true)
@@ -67,7 +68,6 @@ export default function () {
   const handleProfileClose = () => {
     setProfileIsOpen(false)
   }
-  const page = Number(queryString.page) || 1
   const queryClient = useQueryClient()
 
   const userGitQuery = useQuery({
@@ -95,6 +95,7 @@ export default function () {
     })
     setUserProfile(profileUser)
   }
+
   const totalUser = Number(userGitQuery.data?.data.total_count) || 0
   const totalPage = Math.ceil(totalUser / rowsPerPage)
   const likeUserMutation = useMutation({
@@ -102,7 +103,6 @@ export default function () {
       return likeGithubUser(id)
     },
     onSuccess: (_, id) => {
-      setIsLiked(true)
       toast.success(`You liked Github User: ${id}`, {
         position: 'top-right',
         autoClose: 2000,
@@ -120,6 +120,7 @@ export default function () {
     }
   })
   const handleClick = async (id: number) => {
+    setIsLiked(true)
     return likeUserMutation.mutate(id)
   }
 
@@ -176,10 +177,10 @@ export default function () {
                     />
                   </a>
                 </td>
-                <th scope='row' className='whitespace-nowrap  py-4 px-6 font-medium text-gray-900 dark:text-gray-700'>
+                <td className='whitespace-nowrap  py-4 px-6 font-medium text-gray-900 dark:text-gray-700'>
                   {user.login}
-                </th>
-                <td className='py-3 px-6' onChange={() => ''}>
+                </td>
+                <td className='py-3 px-6'>
                   <button onClick={() => handleClick(user.id)}>
                     <FavoriteIcon color='primary' />
                   </button>
