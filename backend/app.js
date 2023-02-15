@@ -18,7 +18,7 @@ app.use(
 // Config Cors
 app.use(
   cors({
-    origin: [process.CLIENT_LOCALHOST_URL, process.env.CLIENT_URL_VERCEL],
+    origin: [process.CLIENT_URL, process.env.CLIENT_URL_VERCEL],
   })
 );
 firebase.initializeApp({
