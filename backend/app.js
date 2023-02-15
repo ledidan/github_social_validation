@@ -15,29 +15,12 @@ app.use(
     extended: true,
   })
 );
-const allowedDomains = [
-  process.env.CLIENT_URL_VERCEL,
-  process.env.CLIENT_LOCALHOST_URL,
-];
-// app.use(cors({ origin: "*"}, ));
-// Config Firebase Setup
-app.use(function (req, res, next) {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "http://localhost:3000",
-    "https://github-social-validation.vercel.app"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
-  );
-  res.setHeader("Access-Control-Allow-Credentials", true);
-  next();
-});
+// Config Cors
+app.use(
+  cors({
+    origin: [process.CLIENT_LOCALHOST_URL, process.env.CLIENT_URL_VERCEL],
+  })
+);
 firebase.initializeApp({
   credential: firebase.credential.cert({
     projectId: process.env.FIREBASE_PROJECT_ID,
