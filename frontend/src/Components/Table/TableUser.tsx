@@ -8,7 +8,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import { styled, alpha } from '@mui/material/styles'
 import InputBase from '@mui/material/InputBase'
 import { useQueryString } from '../../utils/utils'
-import FavoriteIcon from '@mui/icons-material/Favorite'
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { GitUser } from '../../types/profile'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
 
@@ -55,7 +55,7 @@ export default function () {
   const [userProfile, setUserProfile] = React.useState<GitUser | any>()
   const [query, setQuery] = React.useState('')
   const [rowsPerPage, setRowsPerPage] = React.useState(10)
-  const [isLiked, setIsLiked] = React.useState(false)
+  const [favorite, setFavorite] = React.useState(false)
   const [profileIsOpen, setProfileIsOpen] = React.useState(false)
 
   const queryString: { page?: string | number } = useQueryString()
@@ -95,6 +95,7 @@ export default function () {
     })
     setUserProfile(profileUser)
   }
+  // SAVE favorite_github_users
 
   const totalUser = Number(userGitQuery.data?.data.total_count) || 0
   const totalPage = Math.ceil(totalUser / rowsPerPage)
@@ -105,24 +106,26 @@ export default function () {
     onSuccess: (_, id) => {
       toast.success(`You liked Github User: ${id}`, {
         position: 'top-right',
-        autoClose: 2000,
+        autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        progress: undefined,
+        progress: 1,
         theme: 'light'
       })
-      queryClient.invalidateQueries({
-        queryKey: ['dashboard', query, page, rowsPerPage],
-        exact: true
-      })
+      // queryClient.invalidateQueries({
+      //   queryKey: ['dashboard', query, page, rowsPerPage],
+      //   exact: true
+      // })
+      localStorage.setItem('favorite_github_users', JSON.stringify(id))
     }
   })
   const handleClick = async (id: number) => {
-    setIsLiked(true)
+    setFavorite(true)
     return likeUserMutation.mutate(id)
   }
+  // useEffect
 
   return (
     <>
@@ -159,10 +162,7 @@ export default function () {
           </thead>
           <tbody>
             {userGitQuery.data?.data.items.map((user: any, index: number) => (
-              <tr
-                key={index}
-                className='border-b bg-white hover:bg-gray-50 dark:border-gray-700  dark:hover:bg-gray-600'
-              >
+              <tr key={index} className='border-b bg-white hover:bg-gray-50 dark:border-gray-800'>
                 <td className='py-3 px-6'>{user.id}</td>
                 <td className='py-3 px-6'>
                   <a
@@ -182,7 +182,7 @@ export default function () {
                 </td>
                 <td className='py-3 px-6'>
                   <button onClick={() => handleClick(user.id)}>
-                    <FavoriteIcon color='primary' />
+                    <FavoriteBorderIcon color='primary' />
                   </button>
                 </td>
               </tr>
@@ -292,7 +292,7 @@ export default function () {
                 </tr>
               </thead>
               <tbody>
-                <tr className='border-b bg-white hover:bg-gray-50 dark:border-gray-700  dark:hover:bg-gray-600'>
+                <tr className='border-b bg-white hover:bg-gray-50 dark:border-gray-700  '>
                   <td className='py-3 px-6'>{userProfile?.data.id}</td>
                   <td className='py-3 px-6'>
                     <Link

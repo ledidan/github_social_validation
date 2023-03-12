@@ -16,11 +16,7 @@ app.use(
   })
 );
 // Config Cors
-app.use(
-  cors({
-    origin: [process.CLIENT_URL, process.env.CLIENT_URL_VERCEL],
-  })
-);
+app.use(cors());
 firebase.initializeApp({
   credential: firebase.credential.cert({
     projectId: process.env.FIREBASE_PROJECT_ID,

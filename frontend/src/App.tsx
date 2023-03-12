@@ -12,11 +12,11 @@ function App() {
   const navigate = useNavigate()
 
   React.useEffect(() => {
-    if (!userLogged) {
-      return navigate('/')
-    } else {
-      return navigate('/dashboard')
-    }
+    // if (!userLogged) {
+    //   return navigate('/')
+    // } else {
+    //   return navigate('/dashboard')
+    // }
   }, [userLogged])
   const elements = useRoutes([
     {
