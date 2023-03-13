@@ -11,6 +11,8 @@ import { useQueryString } from '../../utils/utils'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { GitUser } from '../../types/profile'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
+import { useDispatch, useSelector } from 'react-redux'
+import { addToFavorite } from '../../app/reducer/gitUsers.slice'
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -58,12 +60,18 @@ export default function () {
   const [favorite, setFavorite] = React.useState(false)
   const [profileIsOpen, setProfileIsOpen] = React.useState(false)
 
+  const favorites = useSelector((state: any) => state.favorite_github_users)
+
+  const dispatch = useDispatch()
   const queryString: { page?: string | number } = useQueryString()
   const page = Number(queryString.page) || 1
   // Handle Profile Dialog
   const handleProfileOpen = () => {
     setProfileIsOpen(true)
   }
+  React.useEffect(() => {
+    localStorage.setItem('favorite_github_users', JSON.stringify(favorites))
+  }, [])
 
   const handleProfileClose = () => {
     setProfileIsOpen(false)
@@ -95,13 +103,12 @@ export default function () {
     })
     setUserProfile(profileUser)
   }
-  // SAVE favorite_github_users
 
   const totalUser = Number(userGitQuery.data?.data.total_count) || 0
   const totalPage = Math.ceil(totalUser / rowsPerPage)
   const likeUserMutation = useMutation({
     mutationFn: (id: number) => {
-      return likeGithubUser(id)
+      return likeGithubUser(`${id}`)
     },
     onSuccess: (_, id) => {
       toast.success(`You liked Github User: ${id}`, {
@@ -114,18 +121,21 @@ export default function () {
         progress: 1,
         theme: 'light'
       })
-      // queryClient.invalidateQueries({
-      //   queryKey: ['dashboard', query, page, rowsPerPage],
-      //   exact: true
-      // })
-      localStorage.setItem('favorite_github_users', JSON.stringify(id))
+      queryClient.invalidateQueries({
+        queryKey: ['dashboard', query, page, rowsPerPage],
+        exact: true
+      })
+      const existingData = JSON.parse(localStorage.getItem('favorite_github_users') || '[]')
+      const newData = Array.isArray(existingData) ? [...existingData, id] : [id]
+      localStorage.setItem('favorite_github_users', JSON.stringify(newData))
+      dispatch(addToFavorite(id))
     }
   })
+
   const handleClick = async (id: number) => {
     setFavorite(true)
     return likeUserMutation.mutate(id)
   }
-  // useEffect
 
   return (
     <>
@@ -182,7 +192,7 @@ export default function () {
                 </td>
                 <td className='py-3 px-6'>
                   <button onClick={() => handleClick(user.id)}>
-                    <FavoriteBorderIcon color='primary' />
+                    {/* <FavoriteBorderIcon color='primary' /> */} {favorite ? 'liked' : 'like'}
                   </button>
                 </td>
               </tr>

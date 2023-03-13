@@ -8,6 +8,8 @@ import 'react-phone-input-2/lib/material.css'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { store } from './app/store'
+import { Provider } from 'react-redux'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -19,10 +21,12 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <App />
-        <ReactQueryDevtools initialIsOpen={true} />
-      </QueryClientProvider>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <App />
+          <ReactQueryDevtools initialIsOpen={true} />
+        </QueryClientProvider>
+      </Provider>
     </BrowserRouter>
   </React.StrictMode>
 )
